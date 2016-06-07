@@ -2,9 +2,9 @@ gomonitor
 =========
 
 
-gomonitor is a simple monitoring tool, that allows you to periodically record certain system information.
+gomonitor is a simple monitoring tool that allows you to periodically record certain system information.
 
-It does so by calling collector instances and passing its output to a logger.
+It does so by calling collector instances and passing their output to a logger.
 
 All current collector implementations work with linux only. But feel free to build your own collectors that work for you.
 
