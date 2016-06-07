@@ -17,3 +17,5 @@ Currently implemented collectors:
 * memCollector: records the currently free memory
 
 * procCollector: records the number of processes started
+
+* demoCollector: used when run with --demo option. Produces values resembling a sin curve

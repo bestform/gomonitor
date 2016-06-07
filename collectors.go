@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	linuxproc "github.com/c9s/goprocinfo/linux"
 )
@@ -20,7 +21,7 @@ type collectorResult struct {
 
 // Collect will return a combination off all outputs
 // It will abort and return an error, should one child fail
-func (c compositeCollector) Collect() ([]collectorResult, error) {
+func (c *compositeCollector) Collect() ([]collectorResult, error) {
 	var collectedResults []collectorResult
 	for _, child := range c.Collectors {
 		result, err := child.Collect()
@@ -41,7 +42,7 @@ func (c *compositeCollector) Add(nc collector) {
 // CPU collector
 type cpuCollector struct{}
 
-func (c cpuCollector) Collect() ([]collectorResult, error) {
+func (c *cpuCollector) Collect() ([]collectorResult, error) {
 	loadAvg, err := linuxproc.ReadLoadAvg("/proc/loadavg")
 	if err != nil {
 		return []collectorResult{collectorResult{}}, err
@@ -53,7 +54,7 @@ func (c cpuCollector) Collect() ([]collectorResult, error) {
 // Memory collector
 type memCollector struct{}
 
-func (c memCollector) Collect() ([]collectorResult, error) {
+func (c *memCollector) Collect() ([]collectorResult, error) {
 	mem, err := linuxproc.ReadMemInfo("/proc/meminfo")
 	if err != nil {
 		return []collectorResult{collectorResult{}}, err
@@ -65,11 +66,22 @@ func (c memCollector) Collect() ([]collectorResult, error) {
 // process collector
 type procCollector struct{}
 
-func (c procCollector) Collect() ([]collectorResult, error) {
+func (c *procCollector) Collect() ([]collectorResult, error) {
 	stat, err := linuxproc.ReadStat("/proc/stat")
 	if err != nil {
 		return []collectorResult{collectorResult{}}, err
 	}
 
 	return []collectorResult{{"Processes running", fmt.Sprintf("%v", stat.Processes)}}, nil
+}
+
+// demo collector
+type demoCollector struct {
+	counter float64
+}
+
+func (c *demoCollector) Collect() ([]collectorResult, error) {
+	r := math.Sin(c.counter)
+	c.counter += 0.3
+	return []collectorResult{{"Demo", fmt.Sprintf("%f", r)}}, nil
 }
