@@ -11,22 +11,27 @@ import (
 // Should one child yield an error, compositeCollector will abort and return the
 // error
 type compositeCollector struct {
-	Collectors []collector
+	Collectors       []collector
+	CollectedResults []collectorResult
+}
+
+type collectorResult struct {
+	Title, Content string
 }
 
 // Collect will return a combination off all outputs
 // It will abort and return an error, should one child fail
-func (c compositeCollector) Collect() (string, error) {
-	var completeResult string
-	for _, child := range c.Collectors {
+func (c compositeCollector) Collect() (collectorResult, error) {
+	c.CollectedResults = make([]collectorResult, len(c.Collectors))
+	for i, child := range c.Collectors {
 		result, err := child.Collect()
 		if err != nil {
-			return "", err
+			return collectorResult{}, err
 		}
-		completeResult = completeResult + result + "\n"
+		c.CollectedResults[i] = result
 	}
 
-	return completeResult, nil
+	return collectorResult{"compositeCollector", "Access the collected results in this struct"}, nil
 }
 
 // Add lets you add a new collector to the collection
@@ -37,35 +42,35 @@ func (c *compositeCollector) Add(nc collector) {
 // CPU collector
 type cpuCollector struct{}
 
-func (c cpuCollector) Collect() (string, error) {
+func (c cpuCollector) Collect() (collectorResult, error) {
 	loadAvg, err := linuxproc.ReadLoadAvg("/proc/loadavg")
 	if err != nil {
-		return "", err
+		return collectorResult{}, err
 	}
 
-	return fmt.Sprintf("Load Average last 5 minutes: %f", loadAvg.Last5Min), nil
+	return collectorResult{"Load Average", fmt.Sprintf("%v", loadAvg.Last5Min)}, nil
 }
 
 // Memory collector
 type memCollector struct{}
 
-func (c memCollector) Collect() (string, error) {
+func (c memCollector) Collect() (collectorResult, error) {
 	mem, err := linuxproc.ReadMemInfo("/proc/meminfo")
 	if err != nil {
-		return "", err
+		return collectorResult{}, err
 	}
 
-	return fmt.Sprintf("Free Memory: %v", mem.MemFree), nil
+	return collectorResult{"Free Memory", fmt.Sprintf("%v", mem.MemFree)}, nil
 }
 
 // process collector
 type procCollector struct{}
 
-func (c procCollector) Collect() (string, error) {
+func (c procCollector) Collect() (collectorResult, error) {
 	stat, err := linuxproc.ReadStat("/proc/stat")
 	if err != nil {
-		return "", err
+		return collectorResult{}, err
 	}
 
-	return fmt.Sprintf("Processes running: %v", stat.Processes), nil
+	return collectorResult{"Processes running", fmt.Sprintf("%v", stat.Processes)}, nil
 }

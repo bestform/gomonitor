@@ -19,16 +19,19 @@ func main() {
 	collector.Add(procCollector{})
 
 	// create a logger
-	logger := stdOutLogger{os.Stdout}
+	logger := ioWriterLoggerWithTime{os.Stdout, defaultResultFormatter}
 
 	// run an endless loop periodically calling the collectors and sending their
 	// output to the logger
 	for {
-		result, err := collector.Collect()
+		_, err := collector.Collect()
 		if err != nil {
 			log.Panic(err)
 		}
-		logger.Log(result)
+		for _, r := range collector.CollectedResults {
+			logger.Log(r)
+		}
+
 		time.Sleep(time.Duration(*delayPtr) * time.Second)
 	}
 }
