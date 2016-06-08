@@ -86,14 +86,38 @@ func (c *demoCollector) Collect() ([]collectorResult, error) {
 	return []collectorResult{{"Demo", fmt.Sprintf("%f", r)}}, nil
 }
 
-// MemoryBufferCollector
-type buffCollector struct{}
+// Memory Available Collector
+type memAvailableCollector struct{}
 
-func (c *buffCollector) Collect() ([]collectorResult, error) {
+func (c *memAvailableCollector) Collect() ([]collectorResult, error) {
+	buf, err := linuxproc.ReadMemInfo("/proc/meminfo")
+	if err != nil {
+		return []collectorResult{{}}, err
+	}
+
+	return []collectorResult{{"Mem Available", fmt.Sprintf("%v", buf.MemAvailable)}}, nil
+}
+
+// Memory Buffer Collector
+type memBufferCollector struct{}
+
+func (c *memBufferCollector) Collect() ([]collectorResult, error) {
 	buf, err := linuxproc.ReadMemInfo("/proc/meminfo")
 	if err != nil {
 		return []collectorResult{{}}, err
 	}
 
 	return []collectorResult{{"Buffers", fmt.Sprintf("%v", buf.Buffers)}}, nil
+}
+
+// Memory Cached Collector
+type memCachedCollector struct{}
+
+func (c *memCachedCollector) Collect() ([]collectorResult, error) {
+	buf, err := linuxproc.ReadMemInfo("/proc/meminfo")
+	if err != nil {
+		return []collectorResult{{}}, err
+	}
+
+	return []collectorResult{{"Memory Cached", fmt.Sprintf("%v", buf.Cached)}}, nil
 }

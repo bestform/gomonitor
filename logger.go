@@ -9,7 +9,7 @@ import (
 type resultFormatter func(collectorResult) string
 
 func defaultResultFormatter(c collectorResult) string {
-	return fmt.Sprintf("%v: %v\n", c.Title, c.Content)
+	return fmt.Sprintf("%v: %v", c.Title, c.Content)
 }
 
 // stdLogger is a simple logger writing to an io.Writer instance

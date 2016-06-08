@@ -18,4 +18,10 @@ Currently implemented collectors:
 
 * procCollector: records the number of processes started
 
+* memAvailableCollector: records memory available
+
+* memBufferCollector: records memory buffered
+
+* memCachedCollector: records memory cached
+
 * demoCollector: used when run with --demo option. Produces values resembling a sin curve
