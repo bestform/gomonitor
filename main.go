@@ -19,6 +19,7 @@ func main() {
 	if *demoPtr {
 		collector.Add(&demoCollector{})
 	} else {
+		collector.Add(&buffCollector{})
 		collector.Add(&cpuCollector{})
 		collector.Add(&memCollector{})
 		collector.Add(&procCollector{})

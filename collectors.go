@@ -85,3 +85,15 @@ func (c *demoCollector) Collect() ([]collectorResult, error) {
 	c.counter += 0.3
 	return []collectorResult{{"Demo", fmt.Sprintf("%f", r)}}, nil
 }
+
+// MemoryBufferCollector
+type buffCollector struct{}
+
+func (c *buffCollector) Collect() ([]collectorResult, error) {
+	buf, err := linuxproc.ReadMemInfo("/proc/meminfo")
+	if err != nil {
+		return []collectorResult{{}}, err
+	}
+
+	return []collectorResult{{"Buffers", fmt.Sprintf("%v", buf.Buffers)}}, nil
+}
